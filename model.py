@@ -67,11 +67,12 @@ class Nic_model(object):
         self.net.eval()
         loss = 0
         begin = time.time()
+        print('\nepoch evaluating...')
         with torch.no_grad():
             for batch_idx, (im, cap_enc) in enumerate(data_loader):
                 im, cap_enc = im.to(device), cap_enc.to(device)
                 l = self.loss(self.net(im, cap_enc), cap_enc[:, 1:])
-                print('epoch evaluating ... {:.1f}%\ttime-consuming: {:.1f}'.format(
+                print('{:.1f}%\ttime-consuming: {:.1f}'.format(
                             batch_idx / len(data_loader) * 100., time.time() - begin),
                             flush=True, end='\r')
                 loss += l

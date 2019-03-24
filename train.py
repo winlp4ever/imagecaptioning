@@ -32,12 +32,14 @@ def main(args):
                                    std=[1, 1, 1])])),
         batch_size=100, **kwargs)
 
+    print(len(train_loader))
+
     model = Nic_model(args.lr, args.weight_decay, args.lr_decay_rate, len(words), args.embed_size)
     model.to(device)
 
     init_epoch = model.load_checkpoint(args.ckpt_path)
     for i in range(1, args.epochs + 1):
-        model._train_ep(train_loader, device, init_epoch + i, args)    
+        model._train_ep(train_loader, device, init_epoch + i, args)
         if i % args.eval_interval == 0:
             model._eval_ep(test_loader, device, init_epoch + i, args)
 
