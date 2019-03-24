@@ -18,7 +18,10 @@ def main(args):
         MyCoco(words, 100, root, annot,
                        transform=transforms.Compose([
                             transforms.Resize((224, 224)),
-                            transforms.ToTensor()
+                            transforms.RandomHorizontalFlip(),
+                            transforms.ToTensor(),
+                            transforms.Normalize(mean=[0.40760392, 0.45795686, 0.48501961],  # subtract imagenet mean
+                                          std=[1, 1, 1]),
                        ])),
         batch_size=args.batch_size, shuffle=True, **kwargs)
 

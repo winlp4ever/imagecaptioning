@@ -27,7 +27,7 @@ class Nic_model(object):
         self.loss = nn.NLLLoss()
         self.optim = optim.Adam(self.net.parameters(), lr=lr, weight_decay=weight_decay)
         self.tracker = SummaryWriter()
-        self.init_lr = lr
+        #self.init_lr = lr no needed for lr exponential decay strategy
         self.lr_decay_rate = lr_decay_rate
 
     def to(self, device):
