@@ -18,8 +18,6 @@ class Vis(nn.Module):
             pretrained_state = model_zoo.load_url(link)
             state = self.state_dict()
             pretrained = { k:v for k,v in pretrained_state.items() if k in state and v.size() == state[k].size() }
-            for k in pretrained:
-                print(k)
             state.update(pretrained)
             self.load_state_dict(state)
 

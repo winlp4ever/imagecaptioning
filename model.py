@@ -39,7 +39,7 @@ class Nic_model(object):
         loss = 0
         begin = time.time()
         for batch_idx, (im, cap_enc) in enumerate(data_loader):
-            if (batch_idx + 1) % 2000 == 0:
+            if (batch_idx + 1) % args.lr_decay_interval == 0:
                 self._update_lr()
             im, cap_enc = im.to(device), cap_enc.to(device)
             self.optim.zero_grad()
@@ -62,6 +62,21 @@ class Nic_model(object):
                                      'state_dict': self.net.state_dict(),
                                      'optimizer': self.optim.state_dict(),
                                  }, epoch)
+
+    def _eval_ep(self, data_loader, device, epoch, args):
+        self.net.eval()
+        loss = 0
+        begin = time.time()
+        for batch_idx, (im, cap_enc) in enumerate(data_loader):
+            im, cap_enc = im.to(device), cap_enc.to(device)
+            l = self.loss(self.net(im, cap_enc), cap_enc[:, 1:])
+            print('epoch evaluating ... {}%\ttime-consuming: {}'.format(
+                        batch_idx / len(data_loader) * 100., time.time() - begin),
+                    flush=True, end='\r')
+            loss += l
+        loss /= len(data_loader)
+        self.tracker.add_scalar('eval_loss', loss, global_step=epoch)
+        print('\nresult: {:.4f}'.format(loss))
 
     def _update_lr(self):
         # exponential decay
