@@ -3,6 +3,7 @@ from store import cfg, make_layers, model_urls
 import torch.utils.model_zoo as model_zoo
 import torch
 
+
 class Vis(nn.Module):
     def __init__(self, cfg, n_features, pretrained=True, link=None):
         super(Vis, self).__init__()
@@ -48,12 +49,11 @@ class Vis(nn.Module):
             param.requires_grad = False
 
 
-
 class Nlp(nn.Module):
     def __init__(self, vocab_size, embed_size):
         super(Nlp, self).__init__()
         self.embed = nn.Embedding(vocab_size, embed_size, max_norm=1)
-        self.recur = nn.LSTM(embed_size, embed_size)
+        self.recur = nn.LSTM(embed_size, embed_size, num_layers=2, dropout=0.2)
         self.dense = nn.Linear(embed_size, vocab_size)
         self.logproba = nn.LogSoftmax(dim=2)
 
@@ -64,7 +64,6 @@ class Nlp(nn.Module):
         guess, _ = self.recur(feats)
         guess = self.dense(guess)
         return self.logproba(guess).permute(1, 2, 0)
-
 
 
 if __name__ == '__main__':

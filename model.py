@@ -4,8 +4,11 @@ import torch.nn.functional as F
 import torch.optim as optim
 from modules import Vis, Nlp
 from store import cfg, model_urls
-# q1: how to load weight partially
-# q2: nlp with pytorch
+from tensorboardX import SummaryWriter
+import os
+import time
+import glob
+
 
 class Nic(nn.Module):
     def __init__(self, vocab_size, embed_size=512):
@@ -19,10 +22,13 @@ class Nic(nn.Module):
 
 
 class Nic_model(object):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, lr, weight_decay, lr_decay_rate, *args, **kwargs):
         self.net = Nic(*args, **kwargs)
         self.loss = nn.NLLLoss()
-        self.optim = optim.Adam(self.net.parameters(), lr=1e-4, weight_decay=1e-5)
+        self.optim = optim.Adam(self.net.parameters(), lr=lr, weight_decay=weight_decay)
+        self.tracker = SummaryWriter()
+        self.init_lr = lr
+        self.lr_decay_rate = lr_decay_rate
 
     def to(self, device):
         self.net = self.net.to(device)
@@ -30,32 +36,63 @@ class Nic_model(object):
     def _train_ep(self, data_loader, device, epoch, args):
         self.net.train()
         self.net.cnn._fix_in_training()
-
         loss = 0
-
+        begin = time.time()
         for batch_idx, (im, cap_enc) in enumerate(data_loader):
+            if (batch_idx + 1) % 2000 == 0:
+                self._update_lr()
             im, cap_enc = im.to(device), cap_enc.to(device)
             self.optim.zero_grad()
             l = self.loss(self.net(im, cap_enc), cap_enc[:, 1:])
             l.backward()
             self.optim.step()
-
             if batch_idx % args.log_interval == 0:
-                print('ep {}: {:.0f}%({}/{})\tnllloss: {:.4f}'.format(epoch, batch_idx / len(data_loader) * 100,
-                        batch_idx * len(im), len(data_loader.dataset), l), flush=True, end='\r')
+                print('ep {}: {:.0f}%({}/{})\tnllloss: {:.4f} in {:.1f}s'.format(epoch, batch_idx / len(data_loader) * 100,
+                        batch_idx * len(im), len(data_loader.dataset), l, time.time() - begin), flush=True, end='\r')
             loss += l
+            self.tracker.add_scalar('train_loss', l, global_step=(epoch - 1) * len(data_loader) + batch_idx)
 
         loss /= len(data_loader)
+        self.tracker.add_scalar('average_train_loss', loss, global_step=epoch)
 
         if epoch % args.sv_interval == 0:
             self.save_checkpoint(args,
                                  {
                                      'epoch': epoch,
-                                     # 'arch': args.arch,
                                      'state_dict': self.net.state_dict(),
                                      'optimizer': self.optim.state_dict(),
                                  }, epoch)
 
+    def _update_lr(self):
+        # exponential decay
+        # lr = init_lr * (rate) ** nbiters
+        for group in self.optim.param_groups:
+            group['lr'] *= (1 - self.lr_decay_rate)
+
     def save_checkpoint(self, args, state, epoch):
         filename = os.path.join(args.ckpt_path, 'checkpoint-{}.pth.tar'.format(epoch))
         torch.save(state, filename)
+
+    def load_checkpoint(self, ckpt_path):
+        max_ep = 0
+        path = ''
+        for fp in glob.glob(os.path.join(ckpt_path, '*')):
+            fn = os.path.basename(fp)
+            fn_ = fn.replace('-', ' ')
+            fn_ = fn_.replace('.', ' ')
+            epoch = int(fn_.split()[1])
+            if epoch > max_ep:
+                path = fp
+                max_ep = epoch
+
+        if os.path.isfile(path):
+            print("=> loading checkpoint '{}'".format(path))
+            checkpoint = torch.load(path)
+            self.net.load_state_dict(checkpoint['state_dict'])
+            self.optim.load_state_dict(checkpoint['optimizer'])
+            print("=> loaded checkpoint '{}' (epoch {})"
+                  .format(path, checkpoint['epoch']))
+            return checkpoint['epoch']
+        else:
+            print("=> no checkpoint found at '{}'".format(ckpt_path))
+            return 0

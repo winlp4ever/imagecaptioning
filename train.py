@@ -22,16 +22,25 @@ def main(args):
                        ])),
         batch_size=args.batch_size, shuffle=True, **kwargs)
 
-    model = Nic_model(len(words), args.embed_size)
+    model = Nic_model(args.lr, args.weight_decay, args.lr_decay_rate, len(words), args.embed_size)
     model.to(device)
-    model._train_ep(train_loader, device, 1, args)
+
+    init_epoch = model.load_checkpoint(args.ckpt_path)
+    for i in range(1, args.epochs + 1):
+        model._train_ep(train_loader, device, init_epoch + i, args)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Image Captioning')
-    parser.add_argument('--batch-size', nargs='?', type=int, default=64)
+    parser.add_argument('--batch-size', nargs='?', type=int, default=128)
     parser.add_argument('--embed-size', nargs='?', type=int, default=512)
     parser.add_argument('--log-interval', nargs='?', type=int, default=1)
     parser.add_argument('--sv-interval', nargs='?', type=int, default=1)
+    parser.add_argument('--lr-decay-interval', nargs='?', type=int, default=2000)
+    parser.add_argument('--lr-decay-rate', nargs='?', type=float, default=1e-5)
+    parser.add_argument('--epochs', nargs='?', type=int, default=100)
+    parser.add_argument('--lr', nargs='?', type=float, default=1e-3)
+    parser.add_argument('--weight-decay', nargs='?', type=float, default=1e-2)
+    parser.add_argument('--ckpt-path', nargs='?', default='./data/checkpoints')
 
     args = parser.parse_args()
 
