@@ -1,16 +1,17 @@
-from dataset import word_dict, MyCoco
+from dataset import load_vocab, MyCoco
 from nltk.translate.bleu_score import sentence_bleu
 from torchvision import datasets, transforms
 import utils
 import argparse
 import torch
 from model import Nic_model
+from torch.nn.utils.rnn import pad_sequence
 
 def _eval(model, im, cap_enc):
     model.net.eval()
     with torch.no_grad():
         im = im[None]
-        cap_enc = cap_enc[None] # add dim batch
+        cap_enc = cap_enc.unsqueeze(0) # add dim batch
         prob = model.net(im, cap_enc)
     return prob
 
@@ -22,11 +23,11 @@ def main(args):
     device = torch.device("cuda" if use_cuda else "cpu")
     kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
 
-    words = word_dict()
+    words = load_vocab()
     idx_to_words = {i: w for w, i in words.items()}
 
     coco = datasets.CocoCaptions(args.root_dir, args.anno_path)
-    mycoco = MyCoco(words, args.seq_len, args.root_dir, args.anno_path,
+    mycoco = MyCoco(words, args.root_dir, args.anno_path,
                    transform=transforms.Compose([
                         transforms.Resize((224, 224)),
                         transforms.ToTensor(),
@@ -40,12 +41,16 @@ def main(args):
 
     print(len(mycoco))
     im, cap_enc = mycoco[args.id]
+    cap_enc = pad_sequence([cap_enc], padding_value=0)
+    #im = im[None]
+    print(im.shape, cap_enc.shape)
     prob = _eval(model, im.to(device), cap_enc.to(device))
+    print(prob.shape)
     pred = utils.vec_to_words(prob, idx_to_words)
     im_, caps = coco[args.id]
     print('auto: {}'.format(pred))
     print('manual: {}'.format(caps))
-    print(utils.bleu_score(caps, pred))
+    print(utils.bleu_score(utils.to_word_bags(caps), pred))
     im_.show()
 
 

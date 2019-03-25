@@ -14,8 +14,8 @@ def vec_to_words(one_hots, idx_to_words):
     # 1 = *end
     # 2 = *unk
     # 3 = *-
-    enc = np.argmax(one_hots.cpu().data.numpy()[0], axis=1).tolist()
-    enc = enc[:enc.index(1)]
+    enc = np.argmax(one_hots.cpu().data.numpy()[:,:,0], axis=1).tolist()
+    #enc = enc[:enc.index(1)]
     candidate = [idx_to_words[i] for i in enc]
     return candidate
 

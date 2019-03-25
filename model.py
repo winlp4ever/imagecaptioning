@@ -8,6 +8,7 @@ from tensorboardX import SummaryWriter
 import os
 import time
 import glob
+from torch.nn.utils.rnn import pack_padded_sequence
 
 
 class Nic(nn.Module):
@@ -18,7 +19,7 @@ class Nic(nn.Module):
 
     def forward(self, im, cap_enc):
         im_feats = self.cnn(im)
-        return self.rnn(im_feats, cap_enc)[:, :,1 :-1]
+        return self.rnn(im_feats, cap_enc)
 
 
 class Nic_model(object):
@@ -38,12 +39,13 @@ class Nic_model(object):
         self.net.cnn._fix_in_training()
         loss = 0
         begin = time.time()
-        for batch_idx, (im, cap_enc) in enumerate(data_loader):
+        for batch_idx, (im, encs) in enumerate(data_loader):
             if (batch_idx + 1) % args.lr_decay_interval == 0:
                 self._update_lr()
-            im, cap_enc = im.to(device), cap_enc.to(device)
+            #encs = pack_padded_sequence(encs, batch_first=True, lengths=ls)[0]
+            im, encs = im.to(device), encs.to(device)
             self.optim.zero_grad()
-            l = self.loss(self.net(im, cap_enc), cap_enc[:, 1:])
+            l = self.loss(self.net(im, encs)[: -1], encs)
             l.backward()
             self.optim.step()
             if batch_idx % args.log_interval == 0:
@@ -71,7 +73,7 @@ class Nic_model(object):
         with torch.no_grad():
             for batch_idx, (im, cap_enc) in enumerate(data_loader):
                 im, cap_enc = im.to(device), cap_enc.to(device)
-                l = self.loss(self.net(im, cap_enc), cap_enc[:, 1:])
+                l = self.loss(self.net(im, cap_enc)[: -1], cap_enc)
                 print('{:.1f}%\ttime-consuming: {:.1f}'.format(
                             batch_idx / len(data_loader) * 100., time.time() - begin),
                             flush=True, end='\r')

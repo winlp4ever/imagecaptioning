@@ -8,7 +8,15 @@ class Vis(nn.Module):
     def __init__(self, cfg, n_features, pretrained=True, link=None):
         super(Vis, self).__init__()
         self.features = make_layers(cfg, batch_norm=False)
-        self.dense = nn.Linear(512 * 7 * 7, n_features)
+        self.classifier = nn.Sequential(
+            nn.Linear(512 * 7 * 7, 4096),
+            nn.ReLU(True),
+            nn.Dropout(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(True),
+            nn.Dropout(),
+        )
+        self.dense = nn.Linear(4096, n_features)
         self.feats = nn.Softmax()
 
         self._init_weights()
@@ -37,6 +45,7 @@ class Vis(nn.Module):
     def forward(self, x):
         x = self.features(x)
         x = x.view(x.size(0), -1)
+        x = self.classifier(x)
         x = self.dense(x)
         x = self.feats(x)
         return x[None] # add dim 0, new size = (1, batch_size, n_features)
@@ -50,20 +59,21 @@ class Vis(nn.Module):
 class Nlp(nn.Module):
     def __init__(self, vocab_size, embed_size):
         super(Nlp, self).__init__()
-        self.embed = nn.Embedding(vocab_size, embed_size, max_norm=1)
-        self.recur = nn.LSTM(embed_size, embed_size, num_layers=2, dropout=0.2)
+        self.embed = nn.Embedding(vocab_size, embed_size, max_norm=1, scale_grad_by_freq=True)
+        self.recur = nn.LSTM(embed_size, embed_size, num_layers=1, dropout=0)
         self.dense = nn.Linear(embed_size, vocab_size)
         self.logproba = nn.LogSoftmax(dim=2)
 
     def forward(self, im_feats, seq):
-        len_seq = seq.shape[0]
         word_feats = self.embed(seq)
-        feats = torch.cat((im_feats, word_feats.permute(1, 0, 2)))
+        if len(word_feats.size()) == 4:
+            word_feats = word_feats[0]
+        feats = torch.cat((im_feats, word_feats))
         guess, _ = self.recur(feats)
         guess = self.dense(guess)
-        return self.logproba(guess).permute(1, 2, 0)
+        return self.logproba(guess).permute(0, 2, 1)
 
 
 if __name__ == '__main__':
     cnn = Vis(cfg['E'], 512, True, link=model_urls['vgg19'])
-    print(cnn.features[2].weight.data)
+    print(cnn.classifier[0].weight.data)
