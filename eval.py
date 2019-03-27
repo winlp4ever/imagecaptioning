@@ -12,8 +12,9 @@ def _eval(model, im, cap_enc):
     model.net.eval()
     with torch.no_grad():
         im = im[None]
+        length = [len(cap_enc)]
         cap_enc = cap_enc[None] # add dim batch
-        prob = model.net(im, cap_enc)
+        prob = model.net(im, cap_enc, length)
     return prob
 
 
@@ -47,10 +48,9 @@ def main(args):
         pred = utils.vec_to_words(prob, idx_to_words)
         im_, caps = coco[i]
         s = utils.bleu_score(utils.to_word_bags(caps), pred)
-        print('processing {}th image... score: {:.2f}'.format(i, s), flush=True, end='\r')
-        score += s
+        score = (score * i + s) / (i + 1)
+        print('processing {}th image... score: {:.2f}'.format(i, score), flush=True, end='\r')
 
-    score /= len(mycoco)
     print('\navg bleu score: {}'.format(score))
 
 

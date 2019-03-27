@@ -14,7 +14,7 @@ from torch.nn.utils.rnn import pack_padded_sequence
 class CapNet(nn.Module):
     def __init__(self, vocab_size, embed_size=512):
         super(CapNet, self).__init__()
-        self.enc = ImgNN(cfg['E'], embed_size, pretrained=True, link=model_urls['vgg19'])
+        self.enc = ImgNN(cfg['E'], embed_size, pretrained=True, link=model_urls['vgg19_bn'])
         self.dec = Nlp(vocab_size, embed_size)
 
     def forward(self, imgs, caps, lens):
@@ -36,7 +36,7 @@ class Captor(object):
 
     def _train_ep(self, data_loader, device, epoch, args):
         self.net.train()
-        self.net.cnn._fix_in_training()
+        self.net.enc._fix_in_training()
         loss = 0
         begin = time.time()
         for batch_idx, (imgs, caps, lens) in enumerate(data_loader):

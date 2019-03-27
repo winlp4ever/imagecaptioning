@@ -7,7 +7,7 @@ from torch.nn.utils.rnn import pack_padded_sequence
 class ImgNN(nn.Module):
     def __init__(self, cfg, n_features, pretrained=True, link=None):
         super(ImgNN, self).__init__()
-        self.features = make_layers(cfg, batch_norm=False)
+        self.features = make_layers(cfg, batch_norm=True)
         self.classifier = nn.Sequential(
             nn.Linear(512 * 7 * 7, 4096),
             nn.ReLU(True),
@@ -79,5 +79,5 @@ class Nlp(nn.Module):
 
 
 if __name__ == '__main__':
-    cnn = ImgNN(cfg['E'], 512, True, link=model_urls['vgg19'])
+    cnn = ImgNN(cfg['E'], 512, True, link=model_urls['vgg19_bn'])
     print(cnn.classifier[0].weight.data)

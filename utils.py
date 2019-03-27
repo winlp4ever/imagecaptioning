@@ -10,9 +10,13 @@ n_grams = [(1, 0, 0, 0),
 
 
 def vec_to_words(one_hots, idx_to_words):
-    enc = np.argmax(one_hots.cpu().data.numpy()[:,:,0], axis=1).tolist()
+    enc = np.argmax(one_hots.cpu().data.numpy()[0], axis=0).tolist()
     candidate = [idx_to_words[i] for i in enc]
-    return candidate
+    if '*end' in candidate:
+        end = candidate.index('*end')
+    else:
+        end = len(candidate)
+    return candidate[1: end]
 
 def token(sen):
     word_list = nltk.word_tokenize(sen)[:-1]
