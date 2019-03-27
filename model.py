@@ -9,17 +9,23 @@ import os
 import time
 import glob
 from torch.nn.utils.rnn import pack_padded_sequence
+from inception import inception_v3
 
 
 class CapNet(nn.Module):
     def __init__(self, vocab_size, embed_size=512):
         super(CapNet, self).__init__()
-        self.enc = ImgNN(cfg['E'], embed_size, pretrained=True, link=model_urls['vgg19_bn'])
+        self.enc = inception_v3(pretrained=True)
+        self.relu = nn.ReLU()
+        self.embeds = nn.Linear(1000, 512)
+        #self.enc = ImgNN(cfg['E'], embed_size, pretrained=True, link=model_urls['vgg19_bn'])
         self.dec = Nlp(vocab_size, embed_size)
 
     def forward(self, imgs, caps, lens):
-        img_embeds = self.enc(imgs)
-        return self.dec(img_embeds, caps, lens)
+        embeds = self.enc(imgs)
+        embeds = self.relu(embeds)
+        embeds = self.embeds(embeds)
+        return self.dec(embeds, caps, lens)
 
 
 class Captor(object):

@@ -15,7 +15,7 @@ def main(args):
     train_loader = torch.utils.data.DataLoader(
         MyCoco(words, args.root_dir, args.anno_path,
                        transform=transforms.Compose([
-                            transforms.Resize((224, 224)),
+                            transforms.Resize([args.im_size] * 2),
                             transforms.RandomHorizontalFlip(),
                             transforms.ToTensor(),
                             transforms.Normalize(mean=[0.407, 0.457, 0.485],  # subtract imagenet mean
@@ -26,7 +26,7 @@ def main(args):
     test_loader = torch.utils.data.DataLoader(
         MyCoco(words, args.eval_dir, args.anno_eval,
                 transform=transforms.Compose([
-                     transforms.Resize((224, 224)),
+                     transforms.Resize([args.im_size] * 2),
                      transforms.ToTensor(),
                      transforms.Normalize(mean=[0.407, 0.457, 0.485],  # subtract imagenet mean
                                    std=[1, 1, 1])])),
@@ -46,6 +46,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Image Captioning')
+    parser.add_argument('--im-size', nargs='?', type=int, default=299)
     parser.add_argument('--batch-size', nargs='?', type=int, default=128)
     parser.add_argument('--embed-size', nargs='?', type=int, default=512)
     parser.add_argument('--log-interval', nargs='?', type=int, default=1)

@@ -30,7 +30,7 @@ def main(args):
     coco = datasets.CocoCaptions(args.root_dir, args.anno_path)
     mycoco = MyCoco(words, args.root_dir, args.anno_path,
                    transform=transforms.Compose([
-                        transforms.Resize((224, 224)),
+                        transforms.Resize([args.im_size] * 2),
                         transforms.ToTensor(),
                         transforms.Normalize(mean=[0.407, 0.457, 0.485],  # subtract imagenet mean
                                       std=[1, 1, 1]),
@@ -56,6 +56,8 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Image Captioning')
+    parser.add_argument('--im-size', nargs='?', type=int, default=299)
+
     parser.add_argument('--embed-size', nargs='?', type=int, default=512)
     parser.add_argument('--seq-len', help='max sequence length', nargs='?', type=int, default=100)
     parser.add_argument('--lr-decay-interval', nargs='?', type=int, default=2000)
