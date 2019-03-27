@@ -68,8 +68,11 @@ class Nlp(nn.Module):
         self.out = nn.LogSoftmax(dim=2)
 
     def forward(self, img_embeds, captions, lengths, eval=False):
-        embeddings = self.embeds(captions)
-        features = torch.cat((img_embeds.unsqueeze(1), embeddings), 1)
+        if captions is not None:
+            embeddings = self.embeds(captions)
+            features = torch.cat((img_embeds.unsqueeze(1), embeddings), 1)
+        else:
+            features = img_embeds.unsqueeze(1)
         lengths = [1 + l for l in lengths]
         packed_features = pack_padded_sequence(features, lengths, batch_first=True)
         predicts, _ = self.unit(features)

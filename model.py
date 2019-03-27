@@ -9,17 +9,30 @@ import os
 import time
 import glob
 from torch.nn.utils.rnn import pack_padded_sequence
+from inception import inception_v3
 
 
 class CapNet(nn.Module):
     def __init__(self, vocab_size, embed_size=512):
         super(CapNet, self).__init__()
-        self.enc = ImgNN(cfg['E'], embed_size, pretrained=True, link=model_urls['vgg19_bn'])
+        self.enc = inception_v3(pretrained=True)
+        self.relu = nn.ReLU(True)
+        self.embeds = nn.Linear(1000, 512)
+        #self.enc = ImgNN(cfg['E'], embed_size, pretrained=True, link=model_urls['vgg19_bn'])
         self.dec = Nlp(vocab_size, embed_size)
 
     def forward(self, imgs, caps, lens):
-        img_embeds = self.enc(imgs)
-        return self.dec(img_embeds, caps, lens)
+        embeds = self.enc(imgs)
+        if self.training:
+            embeds = embeds[0]
+        embeds = self.relu(embeds)
+        embeds = self.embeds(embeds)
+        return self.dec(embeds, caps, lens)
+
+    def _fix_in_training(self):
+        # call when training to fix this part of network untrained (already pretrained)
+        for param in self.enc.parameters():
+            param.requires_grad = False
 
 
 class Captor(object):
@@ -36,7 +49,7 @@ class Captor(object):
 
     def _train_ep(self, data_loader, device, epoch, args):
         self.net.train()
-        self.net.enc._fix_in_training()
+        self.net._fix_in_training()
         loss = 0
         begin = time.time()
         for batch_idx, (imgs, caps, lens) in enumerate(data_loader):
