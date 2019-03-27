@@ -4,17 +4,17 @@ from torchvision import datasets, transforms
 import utils
 import argparse
 import torch
-from model import Nic_model
+from model import Captor
 from torch.nn.utils.rnn import pad_sequence
+
 
 def _eval(model, im, cap_enc):
     model.net.eval()
     with torch.no_grad():
         im = im[None]
-        cap_enc = cap_enc.unsqueeze(0) # add dim batch
+        cap_enc = cap_enc[None] # add dim batch
         prob = model.net(im, cap_enc)
     return prob
-
 
 
 def main(args):
@@ -31,32 +31,31 @@ def main(args):
                    transform=transforms.Compose([
                         transforms.Resize((224, 224)),
                         transforms.ToTensor(),
-                        transforms.Normalize(mean=[0.40760392, 0.45795686, 0.48501961],  # subtract imagenet mean
+                        transforms.Normalize(mean=[0.407, 0.457, 0.485],  # subtract imagenet mean
                                       std=[1, 1, 1]),
                    ]))
-    model = Nic_model(args.lr, args.weight_decay, args.lr_decay_rate, len(words), args.embed_size)
+    model = Captor(args.lr, args.weight_decay, args.lr_decay_rate, len(words), args.embed_size)
     model.to(device)
 
     model.load_checkpoint(args.ckpt_path)
 
-    print(len(mycoco))
-    im, cap_enc = mycoco[args.id]
-    cap_enc = pad_sequence([cap_enc], padding_value=0)
-    #im = im[None]
-    print(im.shape, cap_enc.shape)
-    prob = _eval(model, im.to(device), cap_enc.to(device))
-    print(prob.shape)
-    pred = utils.vec_to_words(prob, idx_to_words)
-    im_, caps = coco[args.id]
-    print('auto: {}'.format(pred))
-    print('manual: {}'.format(caps))
-    print(utils.bleu_score(utils.to_word_bags(caps), pred))
-    im_.show()
+    print('dataset length {}'.format(len(mycoco)))
+    score = 0
+    for i in range(len(mycoco)):
+        im, cap_enc = mycoco[i]
+        prob = _eval(model, im.to(device), cap_enc.to(device))
+        pred = utils.vec_to_words(prob, idx_to_words)
+        im_, caps = coco[i]
+        s = utils.bleu_score(utils.to_word_bags(caps), pred)
+        print('processing {}th image... score: {:.2f}'.format(i, s), flush=True, end='\r')
+        score += s
+
+    score /= len(mycoco)
+    print('\navg bleu score: {}'.format(score))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Image Captioning')
-    parser.add_argument('id', type=int)
     parser.add_argument('--embed-size', nargs='?', type=int, default=512)
     parser.add_argument('--seq-len', help='max sequence length', nargs='?', type=int, default=100)
     parser.add_argument('--lr-decay-interval', nargs='?', type=int, default=2000)

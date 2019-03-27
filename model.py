@@ -2,7 +2,7 @@ import torch, torchvision
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from modules import Vis, Nlp
+from modules import ImgNN, Nlp
 from store import cfg, model_urls
 from tensorboardX import SummaryWriter
 import os
@@ -11,20 +11,20 @@ import glob
 from torch.nn.utils.rnn import pack_padded_sequence
 
 
-class Nic(nn.Module):
+class CapNet(nn.Module):
     def __init__(self, vocab_size, embed_size=512):
-        super(Nic, self).__init__()
-        self.cnn = Vis(cfg['E'], embed_size, pretrained=True, link=model_urls['vgg19'])
-        self.rnn = Nlp(vocab_size, embed_size)
+        super(CapNet, self).__init__()
+        self.enc = ImgNN(cfg['E'], embed_size, pretrained=True, link=model_urls['vgg19'])
+        self.dec = Nlp(vocab_size, embed_size)
 
-    def forward(self, im, cap_enc):
-        im_feats = self.cnn(im)
-        return self.rnn(im_feats, cap_enc)
+    def forward(self, imgs, caps, lens):
+        img_embeds = self.enc(imgs)
+        return self.dec(img_embeds, caps, lens)
 
 
-class Nic_model(object):
+class Captor(object):
     def __init__(self, lr, weight_decay, lr_decay_rate, *args, **kwargs):
-        self.net = Nic(*args, **kwargs)
+        self.net = CapNet(*args, **kwargs)
         self.loss = nn.NLLLoss()
         self.optim = optim.Adam(self.net.parameters(), lr=lr, weight_decay=weight_decay)
         self.tracker = SummaryWriter()
@@ -39,18 +39,17 @@ class Nic_model(object):
         self.net.cnn._fix_in_training()
         loss = 0
         begin = time.time()
-        for batch_idx, (im, encs) in enumerate(data_loader):
+        for batch_idx, (imgs, caps, lens) in enumerate(data_loader):
             if (batch_idx + 1) % args.lr_decay_interval == 0:
                 self._update_lr()
-            #encs = pack_padded_sequence(encs, batch_first=True, lengths=ls)[0]
-            im, encs = im.to(device), encs.to(device)
+            imgs, caps = imgs.to(device), caps.to(device)
             self.optim.zero_grad()
-            l = self.loss(self.net(im, encs)[: -1], encs)
+            l = self.loss(self.net(imgs, caps, lens)[:, :, :-1], caps)
             l.backward()
             self.optim.step()
             if batch_idx % args.log_interval == 0:
                 print('ep {}: {:.0f}%({}/{})\tnllloss: {:.4f} in {:.1f}s'.format(epoch, batch_idx / len(data_loader) * 100,
-                        batch_idx * len(im), len(data_loader.dataset), l, time.time() - begin), flush=True, end='\r')
+                        batch_idx * len(imgs), len(data_loader.dataset), l, time.time() - begin), flush=True, end='\r')
             loss += l
             self.tracker.add_scalar('train_loss', l, global_step=(epoch - 1) * len(data_loader) + batch_idx)
 
@@ -71,9 +70,9 @@ class Nic_model(object):
         begin = time.time()
         print('\nepoch evaluating...')
         with torch.no_grad():
-            for batch_idx, (im, cap_enc) in enumerate(data_loader):
-                im, cap_enc = im.to(device), cap_enc.to(device)
-                l = self.loss(self.net(im, cap_enc)[: -1], cap_enc)
+            for batch_idx, (imgs, caps, lens) in enumerate(data_loader):
+                imgs, caps = imgs.to(device), caps.to(device)
+                l = self.loss(self.net(imgs, caps, lens)[:, :, :-1], caps)
                 print('{:.1f}%\ttime-consuming: {:.1f}'.format(
                             batch_idx / len(data_loader) * 100., time.time() - begin),
                             flush=True, end='\r')
