@@ -54,7 +54,7 @@ if __name__ == '__main__':
     parser.add_argument('--log-interval', nargs='?', type=int, default=1)
     parser.add_argument('--sv-interval', nargs='?', type=int, default=1)
     parser.add_argument('--lr-decay-interval', nargs='?', type=int, default=2000)
-    parser.add_argument('--lr-decay-rate', nargs='?', type=float, default=0.05)
+    parser.add_argument('--lr-decay-rate', nargs='?', type=float, default=0.00)
     parser.add_argument('--epochs', nargs='?', type=int, default=100)
     parser.add_argument('--lr', nargs='?', type=float, default=1e-3)
     parser.add_argument('--weight-decay', nargs='?', type=float, default=1e-5)
@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--eval-dir', nargs='?', default='./data/val2014')
     parser.add_argument('--anno-eval', nargs='?', default='./data/annotations/captions_val2014.json')
-    parser.add_argument('--eval-interval', nargs='?', type=int, default=3)
+    parser.add_argument('--eval-interval', nargs='?', type=int, default=10)
 
     args = parser.parse_args()
 
