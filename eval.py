@@ -6,6 +6,8 @@ import argparse
 import torch
 from model import Captor
 from torch.nn.utils.rnn import pad_sequence
+from play_with import beamsearch
+import random
 
 
 def _eval(model, im, cap_enc):
@@ -20,12 +22,12 @@ def _eval(model, im, cap_enc):
 
 def main(args):
     use_cuda = torch.cuda.is_available()
-    torch.manual_seed(1)
+    torch.manual_seed(random.randint(1, 10000))
     device = torch.device("cuda" if use_cuda else "cpu")
     kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
 
     words = load_vocab()
-    idx_to_words = {i: w for w, i in words.items()}
+    vocab = {i: w for w, i in words.items()}
 
     coco = datasets.CocoCaptions(args.root_dir, args.anno_path)
     mycoco = MyCoco(words, args.root_dir, args.anno_path,
@@ -44,9 +46,8 @@ def main(args):
     score = 0
     for i in range(len(mycoco)):
         im, cap_enc = mycoco[i]
-        prob = _eval(model, im.to(device), cap_enc.to(device))
-        pred = utils.vec_to_words(prob, idx_to_words)
         im_, caps = coco[i]
+        pred = beamsearch(model, device, im, vocab, return_sentence=False)
         s = utils.bleu_score(utils.to_word_bags(caps), pred)
         score = (score * i + s) / (i + 1)
         print('processing {}th image... score: {:.2f}'.format(i, score), flush=True, end='\r')
@@ -66,8 +67,8 @@ if __name__ == '__main__':
     parser.add_argument('--lr', nargs='?', type=float, default=1e-3)
     parser.add_argument('--weight-decay', nargs='?', type=float, default=1e-2)
     parser.add_argument('--ckpt-path', nargs='?', default='./checkpoints')
-    parser.add_argument('--root-dir', nargs='?', default='./data/train2014')
-    parser.add_argument('--anno-path', nargs='?', default='./data/annotations/captions_train2014.json')
+    parser.add_argument('--root-dir', nargs='?', default='./data/val2014')
+    parser.add_argument('--anno-path', nargs='?', default='./data/annotations/captions_val2014.json')
 
 
     args = parser.parse_args()

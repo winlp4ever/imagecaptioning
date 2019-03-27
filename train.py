@@ -3,11 +3,13 @@ import torch
 from torchvision import transforms
 from dataset import MyCoco, load_vocab, collate_fn
 import argparse
+import random
 
 
 def main(args):
     use_cuda = torch.cuda.is_available()
-    torch.manual_seed(1)
+    torch.manual_seed(random.randint(1, 10000))
+
     device = torch.device("cuda" if use_cuda else "cpu")
     kwargs = {'collate_fn': collate_fn, 'num_workers': 1, 'pin_memory': True} if use_cuda else {}
 
