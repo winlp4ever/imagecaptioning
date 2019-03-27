@@ -118,6 +118,8 @@ class Captor(object):
 
         if os.path.isfile(path):
             print("=> loading checkpoint '{}'".format(path))
+            if not torch.cuda.is_available():
+                checkpoint = torch.load(path, map_location='cpu')
             checkpoint = torch.load(path)
             self.net.load_state_dict(checkpoint['state_dict'])
             self.optim.load_state_dict(checkpoint['optimizer'])
