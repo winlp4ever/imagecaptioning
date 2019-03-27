@@ -17,7 +17,6 @@ class ImgNN(nn.Module):
             nn.Dropout(),
         )
         self.embeds = nn.Linear(4096, n_features)
-        self.output = nn.Softmax()
 
         self._init_weights()
 
