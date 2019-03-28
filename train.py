@@ -48,7 +48,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Image Captioning')
-    parser.add_argument('--im-size', nargs='?', type=int, default=299)
+    parser.add_argument('--im-size', nargs='?', type=int, default=224)
     parser.add_argument('--batch-size', nargs='?', type=int, default=128)
     parser.add_argument('--embed-size', nargs='?', type=int, default=512)
     parser.add_argument('--log-interval', nargs='?', type=int, default=1)
