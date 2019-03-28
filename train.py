@@ -54,7 +54,7 @@ if __name__ == '__main__':
     parser.add_argument('--log-interval', nargs='?', type=int, default=1)
     parser.add_argument('--sv-interval', nargs='?', type=int, default=1)
     parser.add_argument('--lr-decay-interval', nargs='?', type=int, default=2000)
-    parser.add_argument('--lr-decay-rate', nargs='?', type=float, default=0.00)
+    parser.add_argument('--lr-decay-rate', nargs='?', type=float, default=0.01)
     parser.add_argument('--epochs', nargs='?', type=int, default=100)
     parser.add_argument('--lr', nargs='?', type=float, default=1e-3)
     parser.add_argument('--weight-decay', nargs='?', type=float, default=1e-5)
