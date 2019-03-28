@@ -16,16 +16,13 @@ from resnet import resnet34
 class CapNet(nn.Module):
     def __init__(self, vocab_size, embed_size=512):
         super(CapNet, self).__init__()
-        #self.enc = inception_v3(pretrained=True)
-        self.enc = resnet34(pretrained=True)
-        self.relu = nn.ReLU(True)
-        self.embeds = nn.Linear(1000, 512)
-        #self.enc = ImgNN(cfg['E'], embed_size, pretrained=True, link=model_urls['vgg19_bn'])
+        self.enc = nn.Sequential(*list(resnet34(pretrained=True).children())[:-1])
+        self.embeds = nn.Linear(512, 512)
         self.dec = Nlp(vocab_size, embed_size)
 
     def forward(self, imgs, caps, lens):
         embeds = self.enc(imgs)
-        embeds = self.relu(embeds)
+        embeds = embeds.view(embeds.size(0), -1)
         embeds = self.embeds(embeds)
         return self.dec(embeds, caps, lens)
 
