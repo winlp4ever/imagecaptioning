@@ -28,4 +28,4 @@ def to_word_bags(bags):
 
 def bleu_score(ref, cand):
     #return max([sentence_bleu(ref, cand, weights=w) for w in n_grams])
-    return sentence_bleu(ref, cand, weights=n_grams[3])
+    return sentence_bleu(ref, cand, weights=n_grams[0])
