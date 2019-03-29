@@ -77,7 +77,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', nargs='?', type=int, default=100)
     parser.add_argument('--lr', nargs='?', type=float, default=1e-3)
     parser.add_argument('--weight-decay', nargs='?', type=float, default=1e-2)
-    parser.add_argument('--ckpt-path', nargs='?', default='./checkpoints')
+    parser.add_argument('--ckpt-path', nargs='?', default='checkpoints')
 
     parser.add_argument('--fn', nargs='?', default='test.jpg')
     args = parser.parse_args()
