@@ -7,8 +7,10 @@ To begin with, we need to install a Python3 environment. We recommend `anaconda`
 1. Firstly, create a virtual env with command:
 
 ```python
-conda create -n nic python=3.6 pillow numpy nltk
+conda create -n nic python=3.6 pillow numpy nltk tensorboardx
 ```
+
+Activate this env with `conda activate nic`.
 
 Proceed to the [PyTorch website]() to download `pytorch` and `torchvision`, or you can just type the following command:
 
@@ -27,8 +29,9 @@ conda install pytorch torchvision cudatoolkit=9.0 -c pytorch
 conda install pytorch-cpu torchvision-cpu -c pytorch
 ```
 
-2. Next step, download our pretrained model checkpoint (to load weights) [here](https://www.dropbox.com/s/h4pypk9s2mxzzme/checkpoint-3.pth.tar?dl=1) and put it in the `checkpoints` dir (create this dir if you don't have it yet)
+2. Next step, download our pretrained model checkpoint (to load weights) and vocab with command `python download_ckpt.py`.
 
+(as this model is trained with gpu, I'm not sure it works with machine with only cpu, please consider using a machine with gpu and `cuda` installed)
 
 Now you're good to go. You can run the following command to check the auto caption
 
