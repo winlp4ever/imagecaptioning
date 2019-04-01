@@ -30,7 +30,7 @@ conda install pytorch torchvision cudatoolkit=9.0 -c pytorch
 conda install pytorch-cpu torchvision-cpu -c pytorch
 ```
 
-2. Next step, download our pretrained model checkpoint (for the network to load pretrained weights) and vocab with command `python download_ckpt.py`.
+2. Next step, download our pretrained model checkpoint (for the network to load pretrained weights) and vocab with command `python download_utils.py`.
 
 Now you're good to go. You can run the following command to check the auto caption
 
@@ -59,7 +59,7 @@ You can download the datasets manually, or use the script we have written with c
 
 Secondly, install the `pycocotools` package to handle the COCO dataset.
 
-```python 
+```python
 conda install -c hcc pycocotools
 ```
 
