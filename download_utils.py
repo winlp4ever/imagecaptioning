@@ -96,7 +96,7 @@ def down_fr_url(urls: list, save_dir: str='', unzip: bool=False):
             if unzip:
                 print('Extracting file ...')
                 zip = zipfile.ZipFile(save_path)
-                zip.extractall('.')
+                zip.extractall(save_dir)
                 zip.close()
 
         except Exception as e:
