@@ -57,6 +57,12 @@ data/
 
 You can download the datasets manually, or use the script we have written with command `python download_dataset.py`. Remember, the dataset files are quite big (20 Gb in total), so be patient, the download will take some time to finish.
 
+Secondly, install the `pycocotools` package to handle the COCO dataset.
+
+```python 
+conda install -c hcc pycocotools
+```
+
 After that, you are all good. Just type the command `python train.py`. If you have troubles, try reduce the batch-size (default 128) to 64 or smaller number with flag `--batch-size`, for ex, `python train.py --batch-size 64`
 
 (Consider using a machine with GPU to train, otherwise it will take very long time to converge)
