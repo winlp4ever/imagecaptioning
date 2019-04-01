@@ -30,9 +30,7 @@ conda install pytorch torchvision cudatoolkit=9.0 -c pytorch
 conda install pytorch-cpu torchvision-cpu -c pytorch
 ```
 
-2. Next step, download our pretrained model checkpoint (to load weights) and vocab with command `python download_ckpt.py`.
-
-(as this model is trained with gpu, I'm not sure it works with machine with only cpu, please consider using a machine with gpu and `cuda` installed)
+2. Next step, download our pretrained model checkpoint (for the network to load pretrained weights) and vocab with command `python download_ckpt.py`.
 
 Now you're good to go. You can run the following command to check the auto caption
 
@@ -40,7 +38,7 @@ Now you're good to go. You can run the following command to check the auto capti
 python play_with.py --fn test.jpg
 ```
 
-Change `test.jpg` to any other image filename that you have downloaded in `images` dir (If you want to test an image, it must be located in `images` dir)
+Change `test.jpg` to any other image filename that you put in `images` dir (If you want to test an image, it must be located in `images` dir)
 
 
 ### Retrain from scratch
@@ -60,6 +58,8 @@ data/
 You can download the datasets manually, or use the script we have written with command `python download_dataset.py`. Remember, the dataset files are quite big (20 Gb in total), so be patient, the download will take some time to finish.
 
 After that, you are all good. Just type the command `python train.py`. If you have troubles, try reduce the batch-size (default 128) to 64 or smaller number with flag `--batch-size`, for ex, `python train.py --batch-size 64`
+
+(Consider using a machine with GPU to train, otherwise it will take very long time to converge)
 
 Run the evaluation with `bleu` score as evaluation metric with command `python eval.py` (default BLEU-1)
 
