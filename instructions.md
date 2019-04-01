@@ -1,6 +1,7 @@
 ### Quick Set-up
 
 **System:** `Ubuntu 18.04`
+(Tested and work on Windows 10!)
 
 To begin with, we need to install a Python3 environment. We recommend `anaconda`. If you already have `anaconda`, you can follow the instructions below:
 
