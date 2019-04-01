@@ -2,6 +2,8 @@ from urllib.request import urlretrieve
 from urllib.parse import urlparse
 import os, sys
 import zipfile
+import time
+import urllib
 
 def error_handle():
     """Print out error line and filename
