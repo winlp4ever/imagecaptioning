@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from nltk.translate.bleu_score import sentence_bleu
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 import nltk
 
 n_grams = [(1, 0, 0, 0),
@@ -26,6 +26,8 @@ def token(sen):
 def to_word_bags(bags):
     return [token(sen) for sen in bags]
 
-def bleu_score(ref, cand):
+def bleu_score(ref, cand, n: int=1):
     #return max([sentence_bleu(ref, cand, weights=w) for w in n_grams])
-    return sentence_bleu(ref, cand, weights=n_grams[0])
+    assert 1 <= n <= 4;
+    chencherry = SmoothingFunction()
+    return sentence_bleu(ref, cand, weights=n_grams[n - 1], smoothing_function=chencherry.method5)

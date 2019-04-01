@@ -42,19 +42,19 @@ def main(args):
     init_epoch = model.load_checkpoint(args.ckpt_path)
     for i in range(1, args.epochs + 1):
         model._train_ep(train_loader, device, init_epoch + i, args)
-        if i % args.eval_interval == 0:
+        if (i + init_epoch) % args.eval_interval == 0:
             model._eval_ep(test_loader, device, init_epoch + i, args)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Image Captioning')
-    parser.add_argument('--im-size', nargs='?', type=int, default=299)
+    parser.add_argument('--im-size', nargs='?', type=int, default=224)
     parser.add_argument('--batch-size', nargs='?', type=int, default=128)
     parser.add_argument('--embed-size', nargs='?', type=int, default=512)
     parser.add_argument('--log-interval', nargs='?', type=int, default=1)
     parser.add_argument('--sv-interval', nargs='?', type=int, default=1)
     parser.add_argument('--lr-decay-interval', nargs='?', type=int, default=2000)
-    parser.add_argument('--lr-decay-rate', nargs='?', type=float, default=0.01)
+    parser.add_argument('--lr-decay-rate', nargs='?', type=float, default=5.0)
     parser.add_argument('--epochs', nargs='?', type=int, default=100)
     parser.add_argument('--lr', nargs='?', type=float, default=1e-3)
     parser.add_argument('--weight-decay', nargs='?', type=float, default=1e-5)

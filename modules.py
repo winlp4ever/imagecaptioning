@@ -63,7 +63,11 @@ class Nlp(nn.Module):
     def __init__(self, vocab_size, embed_size):
         super(Nlp, self).__init__()
         self.embeds = nn.Embedding(vocab_size, embed_size, scale_grad_by_freq=True)
+<<<<<<< HEAD
         self.unit = nn.GRU(embed_size, embed_size, num_layers=1, batch_first=True)
+=======
+        self.unit = nn.LSTM(embed_size, embed_size, num_layers=2, batch_first=True, dropout=0.7)
+>>>>>>> dev2
         self.dense = nn.Linear(embed_size, vocab_size)
         self.out = nn.LogSoftmax(dim=2)
 

@@ -48,7 +48,7 @@ def main(args):
         im, cap_enc = mycoco[i]
         im_, caps = coco[i]
         pred = beamsearch(model, device, im, vocab, return_sentence=False)
-        s = utils.bleu_score(utils.to_word_bags(caps), pred)
+        s = utils.bleu_score(utils.to_word_bags(caps), pred, n=args.bleu_n)
         score = (score * i + s) / (i + 1)
         print('processing {}th image... score: {:.2f}'.format(i, score), flush=True, end='\r')
 
@@ -69,6 +69,9 @@ if __name__ == '__main__':
     parser.add_argument('--ckpt-path', nargs='?', default='./checkpoints')
     parser.add_argument('--root-dir', nargs='?', default='./data/val2014')
     parser.add_argument('--anno-path', nargs='?', default='./data/annotations/captions_val2014.json')
+
+    parser.add_argument('--bleu-n', nargs='?', type=int, help='which BLEU-n score, options are: 1, 2, 3, 4.',
+                        default=1)
 
 
     args = parser.parse_args()

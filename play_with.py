@@ -14,7 +14,7 @@ import random
 def create_embeds(model, image):
     image = image[None]
     embeds = model.net.enc(image)
-    embeds = model.net.relu(embeds)
+    embeds = embeds.view(embeds.size(0), -1)
     return model.net.embeds(embeds)
 
 def beamsearch(model, device, image, vocab, return_sentence=True):
