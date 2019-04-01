@@ -40,7 +40,7 @@ Now you're good to go. You can run the following command to check the auto capti
 python play_with.py --fn test.jpg
 ```
 
-Change `test.jpg` to any other image filename that you have downloaded in `images` dir (I you want to test an image, it must be located in `images` dir)
+Change `test.jpg` to any other image filename that you have downloaded in `images` dir (If you want to test an image, it must be located in `images` dir)
 
 
 ### Retrain from scratch
