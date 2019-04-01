@@ -4,6 +4,7 @@ import os, sys
 import zipfile
 import time
 import urllib
+from math import ceil
 
 BYTES_PER_MB = 1024 * 1024
 
