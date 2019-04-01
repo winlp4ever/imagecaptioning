@@ -42,7 +42,7 @@ def main(args):
     init_epoch = model.load_checkpoint(args.ckpt_path)
     for i in range(1, args.epochs + 1):
         model._train_ep(train_loader, device, init_epoch + i, args)
-        if i % args.eval_interval == 0:
+        if (i + init_epoch) % args.eval_interval == 0:
             model._eval_ep(test_loader, device, init_epoch + i, args)
 
 

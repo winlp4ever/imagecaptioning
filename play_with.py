@@ -27,7 +27,7 @@ def beamsearch(model, device, image, vocab, return_sentence=True):
     cap_tens = None
     while True:
         predict = model.net.dec(embeds, cap_tens, [l])[:, :, -1]
-        id = np.random.choice(np.arange(len(vocab)), p=np.exp(predict.cpu().data.numpy()[0]))
+        id = np.argmax(predict.cpu().data.numpy(), axis=1)[0]
         if id == 1 or count > 20:
             break
         gen_cap.append(vocab[id])
