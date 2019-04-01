@@ -26,7 +26,8 @@ def token(sen):
 def to_word_bags(bags):
     return [token(sen) for sen in bags]
 
-def bleu_score(ref, cand):
+def bleu_score(ref, cand, n: int=1):
     #return max([sentence_bleu(ref, cand, weights=w) for w in n_grams])
+    assert 1 <= n <= 4;
     chencherry = SmoothingFunction()
-    return sentence_bleu(ref, cand, weights=n_grams[0], smoothing_function=chencherry.method5)
+    return sentence_bleu(ref, cand, weights=n_grams[n - 1], smoothing_function=chencherry.method5)
