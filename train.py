@@ -4,6 +4,7 @@ from torchvision import transforms
 from dataset import MyCoco, load_vocab, collate_fn
 import argparse
 import random
+import os
 
 
 def main(args):
@@ -58,12 +59,12 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', nargs='?', type=int, default=100)
     parser.add_argument('--lr', nargs='?', type=float, default=1e-3)
     parser.add_argument('--weight-decay', nargs='?', type=float, default=1e-5)
-    parser.add_argument('--ckpt-path', nargs='?', default='./checkpoints')
-    parser.add_argument('--root-dir', nargs='?', default='./data/train2014')
-    parser.add_argument('--anno-path', nargs='?', default='./data/annotations/captions_train2014.json')
+    parser.add_argument('--ckpt-path', nargs='?', default='checkpoints')
+    parser.add_argument('--root-dir', nargs='?', default=os.path.join('data', 'train2014'))
+    parser.add_argument('--anno-path', nargs='?', default=os.path.join('data', 'annotations', 'captions_train2014.json'))
 
-    parser.add_argument('--eval-dir', nargs='?', default='./data/val2014')
-    parser.add_argument('--anno-eval', nargs='?', default='./data/annotations/captions_val2014.json')
+    parser.add_argument('--eval-dir', nargs='?', default=os.path.join('data', 'val2014'))
+    parser.add_argument('--anno-eval', nargs='?', default=os.path.join('data', 'annotations', 'captions_val2014.json'))
     parser.add_argument('--eval-interval', nargs='?', type=int, default=10)
 
     args = parser.parse_args()
