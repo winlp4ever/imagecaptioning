@@ -56,8 +56,10 @@ data/
     |--(all val images)
 ```
 
+You can download the datasets manually, or use the script we have written with command `python download_dataset.py`. Remember, the dataset files are quite big (20 Gb in total), so be patient, the download will take some time to finish.
+
 After that, you are all good. Just type the command `python train.py`. If you have troubles, try reduce the batch-size (default 128) to 64 or smaller number with flag `--batch-size`, for ex, `python train.py --batch-size 64`
 
-Run the evaluation with `bleu` score as evaluation metric with command `python eval.py`
+Run the evaluation with `bleu` score as evaluation metric with command `python eval.py` (default BLEU-1)
 
 Test your model with `python play_with.py` like told before.
