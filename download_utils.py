@@ -5,6 +5,8 @@ import zipfile
 import time
 import urllib
 
+BYTES_PER_MB = 1024 * 1024
+
 def error_handle():
     """Print out error line and filename
     (from stack overflow)
