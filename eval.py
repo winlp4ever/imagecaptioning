@@ -8,6 +8,7 @@ from model import Captor
 from torch.nn.utils.rnn import pad_sequence
 from play_with import beamsearch
 import random
+import os
 
 
 def _eval(model, im, cap_enc):
@@ -67,8 +68,8 @@ if __name__ == '__main__':
     parser.add_argument('--lr', nargs='?', type=float, default=1e-3)
     parser.add_argument('--weight-decay', nargs='?', type=float, default=1e-2)
     parser.add_argument('--ckpt-path', nargs='?', default='./checkpoints')
-    parser.add_argument('--eval-dir', nargs='?', default=os.path.join('data', 'val2014'))
-    parser.add_argument('--anno-eval', nargs='?', default=os.path.join('data', 'annotations', 'captions_val2014.json'))
+    parser.add_argument('--root-dir', nargs='?', default=os.path.join('data', 'val2014'))
+    parser.add_argument('--anno-path', nargs='?', default=os.path.join('data', 'annotations', 'captions_val2014.json'))
 
     parser.add_argument('--bleu-n', nargs='?', type=int, help='which BLEU-n score, options are: 1, 2, 3, 4.',
                         default=1)
