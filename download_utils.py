@@ -39,6 +39,26 @@ def retri_fn_url(url: str) -> str:
     return os.path.basename(addr)
 
 
+def time_format(secs: int):
+    """Transform nb of secs to time format
+    """
+    s = '{}s'.format(secs % 60).zfill(3)
+    if secs < 60:
+        return s.rjust(6);
+    secs = secs // 60
+    m = '{}\''.format(secs % 60).zfill(3)
+    if secs < 60:
+        return (m + s).rjust(6)
+    secs = secs // 60
+    h = '{}h'.format(secs % 24).zfill(3)
+    if secs < 24:
+        return (h + m).rjust(6)
+    if secs > 2 * 24:
+        return 'uknown'
+    d = '{}d'.format(secs // 24)
+    return (d + h).rjust(6)
+
+
 def down_fr_url(urls: list, save_dir: str='', unzip: bool=False):
     """Downloading urls to a chosen dir, unzip if necessary
 
@@ -78,10 +98,12 @@ def down_fr_url(urls: list, save_dir: str='', unzip: bool=False):
                 down_bar = '[' + '=' * 20 +']'
                 down_size_in_mb = total_size_in_mb
 
-            print('{} {}/{} MB {} {}'.format(down_bar,
+            speed = (count * block_size) / (time.time() - start_time + 1e-3) / 1024
+            time_left = int((total_size_in_mb - down_size_in_mb) * 1024 / (speed + 1e-3))
+            print('{} {}/{} MB {} {}\testim. time left: {}'.format(down_bar,
                     str(down_size_in_mb).rjust(len(str(total_size_in_mb))), # right align text
                     total_size_in_mb, ('(%2.1f%%)'%(percent * 100)).rjust(8),
-                    indicator((count * block_size) / (time.time() - start_time + 1e-3) / 1024)),
+                    indicator(speed), time_format(time_left)),
                 flush=True, end='\r')
     for url in urls:
         try:
@@ -96,7 +118,7 @@ def down_fr_url(urls: list, save_dir: str='', unzip: bool=False):
             if unzip:
                 print('Extracting file ...')
                 zip = zipfile.ZipFile(save_path)
-                zip.extractall(save_dir)
+                zip.extractall('.')
                 zip.close()
 
         except Exception as e:
