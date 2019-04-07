@@ -5,3 +5,4 @@ __pycache__/*
 runs/*
 test_lstm.py
 old/*
+saveims/*

@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 from torchvision import datasets, transforms
-from PIL import Image
+from PIL import Image, ImageFont, ImageDraw, ImageEnhance
 from dataset import load_vocab
 import utils
 import argparse
@@ -61,9 +61,23 @@ def main(args):
     model.load_checkpoint(args.ckpt_path)
 
     im = Image.open(os.path.join('images', args.fn))
-    im.show()
+    #im.show()
     img = preprocess(im)
-    print("auto caption: {}.".format(beamsearch(model, device, img, vocab)))
+    caption = beamsearch(model, device, img, vocab)
+
+    img_ = transforms.Resize((600, 800))(im)
+    draw = ImageDraw.Draw(img_)
+    draw.rectangle(((0, 0), (800, 40)), fill='black')
+    draw.text((20, 20), caption, (255, 255, 255), font=ImageFont.truetype('FreeMono.ttf', 20))
+    img_.show()
+    print('auto caption: {}'.format(caption))
+    ans = input('Do you want to save image? (y/n):')
+    if ans == 'y' or ans == 'Y':
+        if not os.path.exists('saveims'):
+            os.makedirs('saveims')
+        img_.save(os.path.join('saveims', args.fn))
+    else:
+        return
 
 
 if __name__ == '__main__':
