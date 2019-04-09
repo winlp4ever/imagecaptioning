@@ -26,6 +26,7 @@ Some auto captions:
 __Good results.__
 
 <img src="illus/2.jpg" alt="drawing" style="width:300px;"/>
+![](illus/2.jpg | width=300)
 <img src="illus/5.jpg" alt="drawing" style="width:300px;"/>
 
 __Results with minor errors.__
