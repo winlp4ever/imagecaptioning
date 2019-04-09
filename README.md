@@ -25,13 +25,13 @@ Some auto captions:
 
 __Good results.__
 
-<img src="illus/2.jpg" alt="drawing" style="width:300"/>
-<img src="illus/5.jpg" alt="drawing" style="width:300px"/>
+<img src="illus/2.jpg" style="width:300"/>
+<img src="illus/5.jpg" style="width:300px"/>
 
 __Results with minor errors.__
 
-<img src="illus/foot.jpg" alt="drawing" style="width:300px;"/>
-<img src="illus/7.jpg" alt="drawing" style="width:300px;"/>
+<img src="illus/foot.jpg" style="width:300px;"/>
+<img src="illus/7.jpg" style="width:300px;"/>
 
 __Somewhat relevant.__
 
