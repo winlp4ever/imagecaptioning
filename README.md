@@ -25,21 +25,21 @@ Some auto captions:
 
 __Good results.__
 
-<img src="illus/2.jpg" style="width:300"/>
-<img src="illus/5.jpg" style="width:300px"/>
+<img src="illus/2.jpg" width=300/>
+<img src="illus/5.jpg" width=300/>
 
 __Results with minor errors.__
 
-<img src="illus/foot.jpg" style="width:300px;"/>
-<img src="illus/7.jpg" style="width:300px;"/>
+<img src="illus/foot.jpg" width=300/>
+<img src="illus/7.jpg" width=300/>
 
 __Somewhat relevant.__
 
-<img src="illus/9.jpg" alt="drawing" style="width:300px;"/>
-<img src="illus/taxi.jpg" alt="drawing" style="width:300px;"/>
+<img src="illus/9.jpg" alt="drawing" width=300/>
+<img src="illus/taxi.jpg" alt="drawing" width=300/>
 
 
 __Bad results.__
 
-<img src="illus/3.jpg" alt="drawing" style="width:300px;"/>
-<img src="illus/4.jpg" alt="drawing" style="width:300px;"/>
+<img src="illus/3.jpg" alt="drawing" width=300/>
+<img src="illus/4.jpg" alt="drawing" width=300/>
