@@ -1,5 +1,5 @@
 import torch.nn as nn
-from store import cfg, make_layers, model_urls
+from torchvision.models.vgg import cfg, make_layers, model_urls
 import torch.utils.model_zoo as model_zoo
 import torch
 from torch.nn.utils.rnn import pack_padded_sequence

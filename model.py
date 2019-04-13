@@ -3,14 +3,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from modules import ImgNN, Nlp
-from store import cfg, model_urls
 from tensorboardX import SummaryWriter
 import os
 import time
 import glob
 from torch.nn.utils.rnn import pack_padded_sequence
-from inception import inception_v3
-from resnet import resnet34
+from torchvision.models.inception import inception_v3
+from torchvision.models.resnet import resnet34
+from torchvision.models.vgg import cfg, model_urls
 
 
 class CapNet(nn.Module):
